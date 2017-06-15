@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+  db:
+    build: database
+    container_name: mysql-server
+    expose: 
+      - '3306'
+    ports:
+      - '3306:3306'
+    environment:
+      - MYSQL_ROOT_PASSWORD=${ENV_DB_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${ENV_DB_NAME}
+      - MYSQL_USER=${ENV_DB_USER}
+      - MYSQL_PASSWORD=${ENV_DB_PASSWORD}
+    volumes:
+      - ${ENV_DB_VOLUME}:/var/lib/mysql  
+  app:
+    build: tomcat
+    ports:
+      - '8888:8080'
+    depends_on:
+      - db
+    links:
+      - db
+    volumes:
+      - ${ENV_APP_VOLUME}:/usr/local/tomcat/webapps/customer     
+
