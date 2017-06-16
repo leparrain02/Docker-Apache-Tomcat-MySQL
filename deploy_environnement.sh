@@ -5,10 +5,12 @@
 
 docker-compose up -d
 
+echo -n "Waiting for database availability"
 while ! docker-compose exec db sh -c "mysql -u ${ENV_DB_USER} -p${ENV_DB_PASSWORD} -D ${ENV_DB_NAME} -e 'show tables'" > /dev/null 2>&1; do 
-  echo "Database is not available"
-  sleep 1
+  echo -n "."
+  sleep 2
 done
+echo " Done"
 
 for sqlfile in `ls -1 database/scripts/*.sql|sort -n`; do
   docker-compose exec db sh -c "mysql -u ${ENV_DB_USER} -p${ENV_DB_PASSWORD} -D ${ENV_DB_NAME} < /tmp/`basename ${sqlfile}`"
