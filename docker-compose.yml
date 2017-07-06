@@ -2,7 +2,7 @@ version: '3'
 
 services:
   db:
-    build: database
+    image: swarmdb
     container_name: mysql-server
     expose: 
       - '3306'
@@ -13,34 +13,30 @@ services:
       - MYSQL_PASSWORD=${ENV_DB_PASSWORD}
     volumes:
       - ${ENV_DB_VOLUME}:/var/lib/mysql  
+    networks:
+      - webnet
   app:
-    build: tomcat
+    image: swarmapp
     container_name: tomcat-server
     deploy:
       replicas: 5
       resources:
         limits:
-          cpus: "0.1"
-          memory: 50M
+          cpus: "0.2"
+          memory: 200M
       restart_policy:
         condition: on-failure
     expose:
       - '8080'
-    depends_on:
-      - db
-    links:
-      - db
     volumes:
       - ${ENV_APP_VOLUME}:/usr/local/tomcat/webapps/customer     
     networks:
       - webnet
   web:
-    build: apache
+    image: swarmweb
     ports:
       - '9080:80'
-    depends_on:
-      - app
-    links:
-      - app
+    networks:
+      - webnet
 networks:
   webnet:
